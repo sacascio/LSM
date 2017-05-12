@@ -1,3 +1,9 @@
 #!/usr/bin/env python
 
-print (5+5)
+# Script options
+
+
+# Open file if exists
+
+
+# Read each cell and write to new input file
