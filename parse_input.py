@@ -2,7 +2,6 @@
 
 import getopt
 import sys
-import subprocess
 import os
 import openpyxl
 import string
@@ -17,14 +16,10 @@ import re
 # May 12, 2017
 
 # Script assumptions:
-#    1. Input file must be xls or xlsx
+#    1. Input file must be xls or xlsx, each field in pipe seperated format all in column A
 #    2. Input data must be the first worksheet
 
 
-# Open file if exists
-
-
-# Read each cell and write to new input file
 def isValidType(type):
     if bool(re.search('Audio|Video|Private', type)) == True:
         return 1
