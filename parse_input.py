@@ -155,6 +155,7 @@ def main(argv):
             writelog = 0
             
     f.close()
+    workbook.close()
     
     if writelog == 0:
         os.remove('hub_parsed.txt')
