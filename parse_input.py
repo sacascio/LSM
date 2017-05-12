@@ -5,8 +5,11 @@ import sys
 import subprocess
 import os
 import openpyxl
+import string
 from openpyxl.workbook import workbook
-from argparse import Namespace
+from IPy import IP
+import re
+
 
 
 
@@ -22,22 +25,68 @@ from argparse import Namespace
 
 
 # Read each cell and write to new input file
+def isValidType(type):
+    if bool(re.search('Audio|Video|Private', type)) == True:
+        return 1
+    else:
+        print ('Invalid PID type provided.  Expected Audio, Video or Private.  Provided %s' % type)
+        return 0
+    
 
-
+def isValidMod(modulation):
+    if modulation == 'Qam256':
+        return 1
+    else:
+        print('Invalid QAM modulation provided.  Expected Qam256, Provided %s' % modulation)
+        return 0
+    
+    
 def isNum(*args):
-    allfailed = 0
+    isValid = 1
     all = args
     for a in all:
         isvnum = a.isnumeric()
         if isvnum == False:
             print (a + " is not a valid Number" )
-            allfailed = 1
+            isValid = 0
         
 
-    return allfailed
+    return isValid
+
+def isValidIP(*args):
+    isValid = 1
+    all = args
+    for a in all:
+        try:
+            IP(a)
+        except:
+            print (a + ' is not a valid IPv4 address')
+            isValid = 0
+            
+    return isValid
+     
+
+def isValidSessId(macsessid):
+    isValid = 1
+    sessmac = macsessid.split("/")
+    isValidnum = isNum(sessmac[1])
+    if isValidnum == 0:
+        print(sessmac[1] + " is not a valid Number, part of session MAC " + macsessid)
+        
+    if len(sessmac[0]) != 12:
+            print(sessmac[0] + ' is not valid.  MAC address length is %s. Expecting 12' % len(sessmac[0]))
+            isValid = 0
+    else:
+        if all(c in string.hexdigits for c in sessmac[0]) == False:
+            print(sessmac[0] + " is not a valid MAC address, part of session mac " + macsessid)
+            isValid = 0
+        
+    return isValid
+    
   
 
 def main(argv):
+    writelog = 1
     
     try:
         opts,args = getopt.getopt(argv,"hf:",["file="])
@@ -75,32 +124,48 @@ def main(argv):
     
     sessionsheet = workbook.worksheets[0]
     
+    f = open('hub_parsed.txt', 'w')
+    
     for row in range (1, sessionsheet.max_row+1):
         sessionid,macsessid,gwname,gwip,input_gbe,tsid,frequency,inudp,outudp,inmpeg,outmpeg,bw,ingbeip,outgbeip,pk,nds,nagra,sn,modulation,inpid,outpid,type,pmt,pcr = (sessionsheet['A' + str(row)].value).split("|")
+        f.write(sessionsheet['A' + str(row)].value)
+        f.write("|\n")
         validnums   = isNum(sessionid,input_gbe,tsid,frequency,inudp,outudp,inmpeg,outmpeg,bw,pk,nds,nagra,inpid,outpid,pmt,pcr)
-        
-        if validnums == 1:
-            print('Row %s has failures' % row)
-            print('****************************\n\n')
-        
-        """
-        validsessid = isValidSessId(macsessid)
-        validip     = isValidIP(gwip,ingbeip,outgbeip)
+        validsessid   = isValidSessId(macsessid)
+        validip       = isValidIP(gwip,ingbeip,outgbeip)
         validMod    = isValidMod(modulation)
         validtype   = isValidType(type)
         
+        if validnums == 0:
+            print('Row %s has failures' % row)
+            print('************************************************************************\n\n')
         
-        if validnums & validsessid & validip & validMod & validtype:
-            #Write to log file
-        """
+        if validsessid == 0:
+            print('Row %s has failures' % row)
+            print('************************************************************************\n\n')
+            
+        if validip == 0:
+            print('Row %s has failures' % row)
+            print('************************************************************************\n\n')
         
+        if validMod == 0:
+            print('Row %s has failures' % row)
+            print('************************************************************************\n\n')
+        
+        if validtype == 0:
+            print('Row %s has failures' % row)
+            print('************************************************************************\n\n')
+        
+        if ( (not validnums) | (not validsessid) | (not validip) | (not validMod) | (not validtype) ):
+            writelog = 0
+            
+    f.close()
     
-    
-    
+    if writelog == 0:
+        os.remove('hub_parsed.txt')
+    else:
+        print('input file for LSM created: hub_parsed.txt')
     
         
-    
-    
-    
 if __name__ == '__main__':
     main(sys.argv[1:])
