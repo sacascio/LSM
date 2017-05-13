@@ -130,28 +130,10 @@ def main(argv):
         validip       = isValidIP(gwip,ingbeip,outgbeip)
         validMod    = isValidMod(modulation)
         validtype   = isValidType(type)
-        
-        if validnums == 0:
-            print('Row %s has failures' % row)
-            print('************************************************************************\n\n')
-        
-        if validsessid == 0:
-            print('Row %s has failures' % row)
-            print('************************************************************************\n\n')
-            
-        if validip == 0:
-            print('Row %s has failures' % row)
-            print('************************************************************************\n\n')
-        
-        if validMod == 0:
-            print('Row %s has failures' % row)
-            print('************************************************************************\n\n')
-        
-        if validtype == 0:
-            print('Row %s has failures' % row)
-            print('************************************************************************\n\n')
-        
+  
         if ( (not validnums) | (not validsessid) | (not validip) | (not validMod) | (not validtype) ):
+            print('Row %s has failures' % row)
+            print('************************************************************************\n\n')
             writelog = 0
             
     f.close()
