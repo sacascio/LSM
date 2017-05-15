@@ -9,15 +9,19 @@ from openpyxl.workbook import workbook
 from IPy import IP
 import re
 
-
-
-
 # Prepared by Salvatore Cascio, Cisco Systems
 # May 12, 2017
 
 # Script assumptions:
 #    1. Input file must be xls or xlsx, each field in pipe seperated format all in column A
 #    2. Input data must be the first worksheet
+
+def isValidFreq(frequency):
+	if ( (57000000 <= int(frequency) <= 963000000) & (int(frequency) % 3) ) == 0:
+		return 1
+	else:
+		print('Invalid frequency provided, %s' % frequency)
+		return 0
 
 
 def isValidType(type):
@@ -125,13 +129,14 @@ def main(argv):
         sessionid,macsessid,gwname,gwip,input_gbe,tsid,frequency,inudp,outudp,inmpeg,outmpeg,bw,ingbeip,outgbeip,pk,nds,nagra,sn,modulation,inpid,outpid,type,pmt,pcr = (sessionsheet['A' + str(row)].value).split("|")
         f.write(sessionsheet['A' + str(row)].value)
         f.write("|\n")
-        validnums   = isNum(sessionid,input_gbe,tsid,frequency,inudp,outudp,inmpeg,outmpeg,bw,pk,nds,nagra,inpid,outpid,pmt,pcr)
+        validnums     = isNum(sessionid,input_gbe,tsid,frequency,inudp,outudp,inmpeg,outmpeg,bw,pk,nds,nagra,inpid,outpid,pmt,pcr)
         validsessid   = isValidSessId(macsessid)
         validip       = isValidIP(gwip,ingbeip,outgbeip)
-        validMod    = isValidMod(modulation)
-        validtype   = isValidType(type)
+        validMod      = isValidMod(modulation)
+        validtype     = isValidType(type)
+	validFreq     = isValidFreq(frequency) 
   
-        if ( (not validnums) | (not validsessid) | (not validip) | (not validMod) | (not validtype) ):
+        if ( (not validnums) | (not validsessid) | (not validip) | (not validMod) | (not validtype) | (not validFreq ) ):
             print('Row %s has failures' % row)
             print('************************************************************************\n\n')
             writelog = 0
