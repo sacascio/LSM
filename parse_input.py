@@ -12,6 +12,7 @@ import re
 # Prepared by Salvatore Cascio, Cisco Systems
 # May 12, 2017
 
+
 # Script assumptions:
 #    1. Input file must be xls or xlsx, each field in pipe seperated format all in column A
 #    2. Input data must be the first worksheet
