@@ -5,6 +5,7 @@ import getopt
 import sys
 import os
 
+
 # Prepared by Salvatore Cascio, Cisco Systems
 # May 17, 2017
 # This script takes the prepared LSM File, pulls out the unique MAC and Session ID, and finds the srcCli equivalent in the prepared srcCli data that was run by getCFsessions.pl
