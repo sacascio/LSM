@@ -1,18 +1,14 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+#from __future__ import print_function
 import getopt
 import sys
 import os
-import string
-from IPy import IP
-import re
 
 # Prepared by Salvatore Cascio, Cisco Systems
 # May 16, 2017
-# Outstanding:
-#	1. Sort input file
-#	2. Find out why not getting source ID 1997 in test input
+
+
 
 def getpidtype(pidtype):
 	if pidtype == 'Video':
@@ -62,6 +58,8 @@ def main(argv):
     sourcemac = {'sm':'NA'}
     struct = []
     
+    # Sort input file to ensure rows are in order
+    os.system('sort -u %s -o %s' % (filename,filename))
     with open(filename) as f:
 	for x in f:
 		elem = x.split("|")
@@ -69,9 +67,9 @@ def main(argv):
 		mac      = elem[1]
 		mac      = mac[0:12]
 		mac      = ":".join(mac[i]+mac[i+1] for i in range (0,12,2))
-		key = sourceid + mac
+		key      = sourceid + mac
 	
-		if  (sourcemac['sm'] == key):
+		if  sourcemac['sm'] == key:
 			pidtype  = getpidtype(elem[-4])	
 			inpid    = hex(int(elem[19])).replace('0x','').upper()
 			outpid   = hex(int(elem[20])).replace('0x','').upper()
@@ -79,8 +77,9 @@ def main(argv):
 			struct.append(outpid)
 			struct.append(pidtype)
 		else:
-			print (','.join(map(str, struct)))
-			struct[:] = []
+			if  sourcemac['sm'] != 'NA':
+				print (','.join(map(str, struct))) 
+				struct[:] = []
 			sourcemac = { 'sm' : key }
 			gwname   = elem[2]
 			mpsrc    = elem[17]
@@ -122,7 +121,9 @@ def main(argv):
 			struct.append(inpid)
 			struct.append(outpid)
 			struct.append(pidtype)
-
+	
+	# Print last line of file
+	print (','.join(map(str, struct)))
 		
 if __name__ == '__main__':
     main(sys.argv[1:])
