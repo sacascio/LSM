@@ -60,6 +60,7 @@ def main(argv):
     
     # Sort input file to ensure rows are in order
     os.system('sort -u %s -o %s' % (filename,filename))
+    
     with open(filename) as f:
 	for x in f:
 		elem = x.split("|")
