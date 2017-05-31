@@ -2,10 +2,12 @@
 
 import getopt
 import sys
-import os
 
 # Prepared by Salvatore Cascio, Cisco Systems
 # SC May 31, 2017 SC.
+# 1. add routine to get DNCS IP (DNCS name given)
+# 2. add routine to get QP IP
+# 3. Remove input for DNCS IP address
 
 def onlineprintstatic(onlinefile):
 
@@ -48,14 +50,14 @@ def main(argv):
     writelog = 1
     
     try:
-        opts,args = getopt.getopt(argv,"hd:f:n:q:e:",["dncsip=","file=","dncsname=","qamproxyip=","ermvip="])
+        opts,args = getopt.getopt(argv,"hd:f:n:e:",["dncsip=","file=","dncsname=","ermvip="])
     except getopt.GetoptError as err:
         print (istr(err))
         sys.exit(2)
     else:
         for opt,arg in opts:
             if opt == '-h':
-                print (sys.argv[0] + " -d|--dncsip <dncs_ip> -f|--file <rfgw_file> -n|--dncsname <dncsname> -q|--qamproxyip <qam_proxy_ip> -e|--ermvip <ermvip> ")
+                print (sys.argv[0] + " -d|--dncsip <dncs_ip> -f|--file <rfgw_file> -n|--dncsname <dncsname> -e|--ermvip <ermvip> ")
                 sys.exit(1)
             elif opt in ( "-f", "--file"):
                 filename = arg
@@ -63,8 +65,6 @@ def main(argv):
                 dncsip = arg
             elif opt in ( "-n", "--dncsname"):
                 dncsname = arg
-            elif opt in ( "-q", "--qamproxyip"):
-                qamproxyip = arg
             elif opt in ( "-e", "--ermvip"):
                 ermvip = arg
             else:
@@ -72,7 +72,7 @@ def main(argv):
                 sys.exit(2)
 
     if len(argv) == 0:
-        print ("Usage: " +  sys.argv[0] + " -d|--dncsip <dncs_ip> -f|--file <rfgw_file> -n|--dncsname <dncsname> -q|--qamproxyip <qam_proxy_ip> -e|--ermvip <ermvip> No arguments given")
+        print ("Usage: " +  sys.argv[0] + " -d|--dncsip <dncs_ip> -f|--file <rfgw_file> -n|--dncsname <dncsname> -e|--ermvip <ermvip> No arguments given")
         sys.exit(1)
 
     try:
@@ -91,12 +91,6 @@ def main(argv):
         dncsname
     except NameError:
         print ("DNCS Name not specified (-n|--dncsname")
-        sys.exit(1)
-    
-    try:
-        qamproxyip
-    except NameError:
-        print ("QAM Proxy IP not specified (-q|--qamproxyip")
         sys.exit(1)
     
     try:
@@ -121,6 +115,8 @@ def main(argv):
     for y in range (1,numqp+1):
         suffix = "%02d" % y
         gwprefix = "QP" + suffix + "_"
+        qpname = dncsname.upper() + suffix
+        print qpname
         onlinefile = "%s_QP_online.conf.%s" % (dncsname,suffix)
         preconfigfile = "%s_QP_preconfig.conf.%s" % (dncsname,suffix)
         onlineprintstatic(onlinefile)
