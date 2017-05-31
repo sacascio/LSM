@@ -5,7 +5,7 @@ import sys
 import os
 
 # Prepared by Salvatore Cascio, Cisco Systems
-# SC May 31, 2017 SC
+# SC May 31, 2017 SC.
 
 def onlineprintstatic(onlinefile):
 
