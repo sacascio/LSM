@@ -4,7 +4,7 @@ import getopt
 import sys
 
 # Prepared by Salvatore Cascio, Cisco Systems
-# SC May 31, 2017 SC.
+# May 31, 2017
 
 
 def getdncsip():
