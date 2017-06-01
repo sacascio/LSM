@@ -5,9 +5,22 @@ import sys
 
 # Prepared by Salvatore Cascio, Cisco Systems
 # SC May 31, 2017 SC.
-# 1. add routine to get DNCS IP (DNCS name given)
-# 2. add routine to get QP IP
-# 3. Remove input for DNCS IP address
+
+
+def getdncsip():
+    with open('dncsip','r') as f:
+        dncsmap = dict([line.strip().split(",") for line in f])
+        return dncsmap
+
+def getqpmap():
+    with open('qplist','r') as f:
+        qpmap = dict([line.strip().split(",") for line in f])
+        return qpmap
+
+def getermmap():
+    with open('ermlist','r') as f:
+        ermmap = dict([line.strip().split(",") for line in f])
+        return ermmap
 
 def onlineprintstatic(onlinefile):
 
@@ -36,43 +49,52 @@ GratuitousArp Enabled
     qp_preconfig.close()
     return
 
-def printdefperIP_online(qp_preconfig,dncsip,rfgwname):
+def printdefperIP_online(qp_online,dncsip,rfgwname):
 
     template = """object %s  
 DNCSIpAddress %s
 ;
 """ %(rfgwname,dncsip)
-    qp_preconfig.write(template)
+    qp_online.write(template)
     return
 
+def printdefperIP_preconfig(qp_preconfig,qpname,qpip,ermvip,qamrealip):
+
+    template = """create GqiQamProxy %s
+IpAddress %s
+AdminState InService
+DNCSConnectionRetry 5
+DNCSIpAddress 0
+ERMIpAddress %s
+RealQamIP %s
+;
+""" %(qpname,qpip,ermvip,qamrealip)
+    qp_preconfig.write(template)
+    return
 
 def main(argv):
     writelog = 1
     
     try:
-        opts,args = getopt.getopt(argv,"hd:f:n:e:",["dncsip=","file=","dncsname=","ermvip="])
+        opts,args = getopt.getopt(argv,"hf:n:",["file=","dncsname="])
     except getopt.GetoptError as err:
-        print (istr(err))
+        print (str(err))
         sys.exit(2)
     else:
         for opt,arg in opts:
             if opt == '-h':
-                print (sys.argv[0] + " -d|--dncsip <dncs_ip> -f|--file <rfgw_file> -n|--dncsname <dncsname> -e|--ermvip <ermvip> ")
+                print (sys.argv[0] + " -f|--file <rfgw_file> -n|--dncsname <dncsname>")
                 sys.exit(1)
             elif opt in ( "-f", "--file"):
                 filename = arg
-            elif opt in ( "-d", "--dncsip"):
-                dncsip = arg
             elif opt in ( "-n", "--dncsname"):
                 dncsname = arg
-            elif opt in ( "-e", "--ermvip"):
-                ermvip = arg
             else:
                 assert False, "Unknown"
                 sys.exit(2)
 
     if len(argv) == 0:
-        print ("Usage: " +  sys.argv[0] + " -d|--dncsip <dncs_ip> -f|--file <rfgw_file> -n|--dncsname <dncsname> -e|--ermvip <ermvip> No arguments given")
+        print ("Usage: " +  sys.argv[0] + " -f|--file <rfgw_file> -n|--dncsname <dncsname> No arguments given")
         sys.exit(1)
 
     try:
@@ -82,22 +104,14 @@ def main(argv):
         sys.exit(1)
     
     try:
-        dncsip
-    except NameError:
-        print ("DNCS IP not specified (-d|--dncsip")
-        sys.exit(1)
-    
-    try:
         dncsname
     except NameError:
         print ("DNCS Name not specified (-n|--dncsname")
         sys.exit(1)
     
-    try:
-        ermvip
-    except NameError:
-        print ("ERM VIP not specified (-e|--ermvip")
-        sys.exit(1)
+    dncsmap = getdncsip()
+    qpmap   = getqpmap()
+    ermmap  = getermmap() 
     
     with open(filename,'r') as f:
         content = f.readlines()
@@ -116,7 +130,6 @@ def main(argv):
         suffix = "%02d" % y
         gwprefix = "QP" + suffix + "_"
         qpname = dncsname.upper() + suffix
-        print qpname
         onlinefile = "%s_QP_online.conf.%s" % (dncsname,suffix)
         preconfigfile = "%s_QP_preconfig.conf.%s" % (dncsname,suffix)
         onlineprintstatic(onlinefile)
@@ -129,8 +142,9 @@ def main(argv):
         for z in range(start,end):
             data =  content[z].split(",")
             rfgwname = gwprefix + data[0]
-            printdefperIP_online(qp_online,dncsip,rfgwname)
-            #printdefperIP_preconfig(qp_preconfig,dncsip,rfgwname)
+            rfgwip   = data[1]
+            printdefperIP_online(qp_online,dncsmap[dncsname.upper()],rfgwname)
+            printdefperIP_preconfig(qp_preconfig,rfgwname,qpmap[qpname],ermmap[dncsname.upper()],rfgwip)
         qp_online.close()
         qp_preconfig.close()
         start = start + 20
