@@ -128,7 +128,7 @@ def main(argv):
     
     for y in range (1,numqp+1):
         suffix = "%02d" % y
-        gwprefix = "QP" + suffix + "_"
+        #gwprefix = "QP" + suffix + "_"
         qpname = dncsname.upper() + suffix
         onlinefile = "%s_QP_online.conf.%s" % (dncsname,suffix)
         preconfigfile = "%s_QP_preconfig.conf.%s" % (dncsname,suffix)
@@ -141,7 +141,8 @@ def main(argv):
             end = num
         for z in range(start,end):
             data =  content[z].split(",")
-            rfgwname = gwprefix + data[0]
+            #rfgwname = gwprefix + data[0]
+            rfgwname = data[0]
             rfgwip   = data[1]
             printdefperIP_online(qp_online,dncsmap[dncsname.upper()],rfgwname)
             printdefperIP_preconfig(qp_preconfig,rfgwname,qpmap[qpname],ermmap[dncsname.upper()],rfgwip)
