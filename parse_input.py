@@ -112,8 +112,6 @@ def main(argv):
     except NameError:
         print "Filename not specified (-f or --file)"
         sys.exit(1)
-        
-        
     
     if not os.path.isfile(filename):
         print('Filename ' + filename + " does not exist")
