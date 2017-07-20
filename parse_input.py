@@ -80,9 +80,10 @@ def printDups(pstruct):
 
 
    # add number of column headers - should equal max number of collided PIDs per carrier
-   
    if maxcount < 2:
-        os.remove('dup_pids.xlsx')
+       if os.path.isfile('dup_pids.xlsx'):
+           fwb.close()
+           os.remove('dup_pids.xlsx')
    else:
         print "See dup_pids.xlsx - Duplicate PIDs per transport/RFGW-1 found"
         col = 'C'
@@ -238,7 +239,11 @@ def main(argv):
 
         data = (sessionsheet['A' + str(row)].value).split("|")
         f.write(sessionsheet['A' + str(row)].value)
-        f.write("|\n")
+        if sessionsheet['A' + str(row)].value[-1] != "|":
+            f.write("|\n")
+        else:
+            f.write("\n")
+
         validnums     = isNum(data[0],data[4],data[5],data[6],data[7],data[8],data[9],data[10],data[11],data[14],data[15],data[16],data[19],data[20],data[22],data[23])
         validsessid   = isValidSessId(data[1])
         validip       = isValidIP(data[3],data[12],data[13])
