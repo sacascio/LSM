@@ -13,6 +13,7 @@ import xlsxwriter
 
 # Prepared by Salvatore Cascio, Cisco Systems
 # May 12, 2017
+# Updated August 1, 2017
 
 # Script assumptions:
 #    1. Input file must be xls or xlsx, each field in pipe seperated format all in column A
