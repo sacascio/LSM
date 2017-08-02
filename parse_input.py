@@ -101,7 +101,7 @@ def printDups(pstruct):
    fwb.close()
    return isValid
 
-def addtouniqpids(pstruct,gwname,frequency,outmpeg,pk,nds,nagra,pmt,pcr,sessmac,mac):
+def addtouniqpids(pstruct,gwname,frequency,pk,nds,nagra,pmt,pcr,sessmac,mac):
     frequency = int(frequency) / 1000000
     mykey = gwname + "," + str(frequency)
     if sessmac.has_key(mac):
@@ -113,10 +113,10 @@ def addtouniqpids(pstruct,gwname,frequency,outmpeg,pk,nds,nagra,pmt,pcr,sessmac,
     if  pstruct.has_key(mykey):
         currlist = pstruct[mykey]
         currlist = list(currlist)
-        currlist.extend([outmpeg,pk,nds,nagra,pmt,pcr]) 
+        currlist.extend([pk,nds,nagra,pmt,pcr]) 
         pstruct[mykey] = (currlist)
     else:
-        pstruct[mykey] = (outmpeg,pk,nds,nagra,pmt,pcr)
+        pstruct[mykey] = (pk,nds,nagra,pmt,pcr)
 
 def isValidFreq(frequency):
 	if ( (570000000 <= int(frequency) <= 963000000) and (int(frequency) % 3) ) == 0:
@@ -256,7 +256,8 @@ def main(argv):
         vwcount = len(re.findall("visible|vw", data[17],re.IGNORECASE))
 
         if data[21] == 'Video' and vwcount == 0:
-            addtouniqpids(pstruct,data[2],data[6],data[10],data[14],data[15],data[16],data[22],data[23],sessmac,data[1])
+            #addtouniqpids(pstruct,data[2],data[6],data[10],data[14],data[15],data[16],data[22],data[23],sessmac,data[1])
+            addtouniqpids(pstruct,data[2],data[6],data[14],data[15],data[16],data[22],data[23],sessmac,data[1])
 
         
         if ( (not validnums) | (not validsessid) | (not validip) | (not validMod) | (not validtype) | (not validFreq ) ):
